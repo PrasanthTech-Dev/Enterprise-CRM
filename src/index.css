@@ -1,0 +1,76 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+}
+
+@layer base {
+  html,
+  body,
+  #root {
+    height: 100%;
+    overflow: hidden;
+  }
+  body {
+    @apply bg-bg font-sans text-slate-200 antialiased;
+    background-image: radial-gradient(1200px 500px at 85% -10%, rgba(100, 112, 243, 0.12), transparent 60%),
+      radial-gradient(900px 400px at -10% 0%, rgba(34, 211, 238, 0.05), transparent 60%);
+    background-attachment: fixed;
+  }
+  ::selection {
+    background: rgba(100, 112, 243, 0.45);
+  }
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: #2b3556 transparent;
+  }
+  *::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  *::-webkit-scrollbar-thumb {
+    background: #2b3556;
+    border-radius: 999px;
+  }
+  input[type='date']::-webkit-calendar-picker-indicator,
+  input[type='datetime-local']::-webkit-calendar-picker-indicator {
+    filter: invert(0.7);
+    cursor: pointer;
+  }
+}
+
+@layer components {
+  .card {
+    @apply rounded-2xl border border-line bg-surface shadow-card transition-all duration-300;
+  }
+  .card-interactive {
+    @apply transition-all duration-300 hover:-translate-y-1 hover:border-blue-500/40 hover:shadow-xl hover:shadow-blue-500/10;
+  }
+  .row-interactive {
+    @apply transition-colors duration-150 hover:bg-blue-600/[0.06];
+  }
+  .field {
+    @apply w-full rounded-xl border border-line bg-elevated/60 px-3.5 py-2.5 text-sm text-slate-100 placeholder:text-muted/70 transition-all duration-200 focus:border-blue-400 focus:bg-elevated/90 focus:outline-none focus:ring-2 focus:ring-blue-500/25 focus:shadow-[0_0_15px_rgba(59,130,246,0.2)] disabled:cursor-not-allowed disabled:opacity-60;
+  }
+  .field-error {
+    @apply border-rose-500/70 focus:border-rose-500 focus:ring-rose-500/25;
+  }
+  .skeleton {
+    @apply relative overflow-hidden rounded-lg bg-elevated;
+  }
+  .skeleton::after {
+    content: '';
+    @apply absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/5 to-transparent;
+    animation: shimmer 1.4s infinite;
+  }
+}
+
+.recharts-tooltip-wrapper {
+  outline: none;
+}
+.recharts-cartesian-axis-tick-value {
+  fill: #8a94b2;
+  font-size: 12px;
+}
