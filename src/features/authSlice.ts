@@ -1,6 +1,6 @@
 import { createAsyncThunk, createSlice, type PayloadAction } from '@reduxjs/toolkit';
 import { bootstrap, type SeedData } from '@/app/bootstrap';
-import { buildUsers } from '@/data/seed';
+import { buildSeed, buildUsers } from '@/data/seed';
 import type { Preferences, User } from '@/types';
 import { delay, storage } from '@/utils/async';
 import { DEMO_OTP } from '@/utils/constants';
@@ -126,16 +126,15 @@ export const login = createAsyncThunk<
     // Sync to persistent 'data' in localStorage so page reloads keep this user
     try {
       let savedData = storage.get<SeedData>('data');
-      if (!savedData || !Array.isArray(savedData.users)) {
-        savedData = {
-          users: buildUsers(),
-          leads: [],
-          deals: [],
-          customers: [],
-          tasks: [],
-          activities: [],
-          notifications: [],
-        } as unknown as SeedData;
+      if (
+        !savedData ||
+        !Array.isArray(savedData.users) ||
+        !Array.isArray(savedData.leads) ||
+        savedData.leads.length === 0 ||
+        !Array.isArray(savedData.customers) ||
+        savedData.customers.length === 0
+      ) {
+        savedData = buildSeed();
       }
       const idx = savedData.users.findIndex((u) => u.id === user!.id);
       if (idx >= 0) {

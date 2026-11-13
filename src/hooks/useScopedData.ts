@@ -20,7 +20,15 @@ export function useScopedData(options: { onlyMine?: boolean } = {}) {
   const team = isManager && !options.onlyMine;
 
   return useMemo(() => {
-    const scope = <T extends { ownerId: string }>(items: T[]) => (team ? items : items.filter((i) => i.ownerId === user.id));
+    const scope = <T extends { ownerId: string }>(items: T[]) => {
+      if (team) return items;
+      const own = items.filter((i) => i.ownerId === user.id);
+      if (own.length > 0) return own;
+      // If a custom account has not yet been assigned individual records, fall back to role owner default so personal view is populated
+      const roleDefaultOwner = user.role === 'manager' ? 'u1' : user.role === 'sales_rep' ? 'u2' : 'u4';
+      const fallback = items.filter((i) => i.ownerId === roleDefaultOwner);
+      return fallback.length > 0 ? fallback : items;
+    };
     return {
       user,
       users,

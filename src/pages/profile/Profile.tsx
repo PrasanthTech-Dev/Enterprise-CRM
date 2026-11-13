@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { BadgeCheck, Lock, ShieldCheck } from 'lucide-react';
+import { BadgeCheck, Lock, RotateCcw, ShieldCheck } from 'lucide-react';
+import { bootstrap } from '@/app/bootstrap';
 import { useAppDispatch, useCurrentUser, usePermission, useToast } from '@/app/hooks';
 import { changePassword, updatePreferences, updateProfile } from '@/features/authSlice';
 import { useForm, validators } from '@/hooks/useForm';
@@ -36,6 +37,7 @@ function ProfileTab() {
   const dispatch = useAppDispatch();
   const toast = useToast();
   const user = useCurrentUser();
+  const [resettingDemo, setResettingDemo] = useState(false);
 
   const initial = useMemo(() => ({ name: user.name, email: user.email, phone: user.phone, title: user.title, department: user.department, timezone: user.timezone, bio: user.bio }), [user]);
   const { bind, handleSubmit, submitting, submitError } = useForm(initial, (v) => ({
@@ -52,6 +54,18 @@ function ProfileTab() {
     toast('success', 'Profile updated', 'Your changes have been saved.');
   });
 
+  const handleResetDemoData = async () => {
+    setResettingDemo(true);
+    try {
+      await dispatch(bootstrap({ forceReset: true })).unwrap();
+      toast('success', 'Demo data reloaded', 'All demo leads, deals, customers and tasks have been restored.');
+    } catch {
+      toast('error', 'Reset failed', 'Could not reload demo data.');
+    } finally {
+      setResettingDemo(false);
+    }
+  };
+
   return (
     <div className="grid grid-cols-1 gap-4 xl:grid-cols-3">
       <Card className="h-fit p-6 text-center">
@@ -64,6 +78,21 @@ function ProfileTab() {
           <div className="flex justify-between gap-3"><dt className="text-muted">Member since</dt><dd className="text-slate-200">{formatDate(user.joinedAt, 'MMM yyyy')}</dd></div>
           {user.monthlyTarget > 0 && <div className="flex justify-between gap-3"><dt className="text-muted">Monthly target</dt><dd className="text-slate-200">${user.monthlyTarget.toLocaleString()}</dd></div>}
         </dl>
+        <div className="mt-6 border-t border-line pt-5 text-left">
+          <p className="text-xs font-medium text-slate-300">Demo CRM Data</p>
+          <p className="mt-0.5 text-xs text-muted">Restore all sample pipeline deals, leads, customers and tasks.</p>
+          <Button
+            type="button"
+            variant="secondary"
+            size="sm"
+            loading={resettingDemo}
+            icon={<RotateCcw className="h-3.5 w-3.5" />}
+            className="mt-3 w-full justify-center text-xs"
+            onClick={handleResetDemoData}
+          >
+            Reset Demo Data
+          </Button>
+        </div>
       </Card>
 
       <Card className="xl:col-span-2">
